@@ -1,0 +1,16 @@
+version: "3"
+
+tasks:
+  install_linux:
+    cmds:
+      - mkdir -p ./bin
+      - go build -o ./bin/adf ./main.go
+      - mkdir -p $HOME/.local/bin
+      - cp ./bin/adf $HOME/.local/bin/
+    silent: false
+
+  uninstall_linux:
+    cmds:
+      - rm $HOME/.local/bin/adf
+    silent: false
+
