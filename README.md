@@ -1,5 +1,6 @@
 # adf-cli
-Repositório para a ferramenta de CLI do sistema Ambiente de Design FHIR (ADF) para o trabalho da disciplina Experiência de Usuário de Software.
+Repositório para o aplicativo CLI do 
+Ambiente de Design FHIR (ADF).
 
 # Documentação preliminar
 
@@ -7,3 +8,9 @@ Repositório para a ferramenta de CLI do sistema Ambiente de Design FHIR (ADF) p
   
 
 ## [Árvore de comandos](https://github.com/karlosdaniel451/adf-cli/wiki/%C3%81rvore-de-comandos)
+
+## Geração de executáveis
+
+- `GOOS=windows GOARCH=amd64 go build -o adf.exe`
+- `GOOS=darwin GOARCH=amd64 go build -o adf`
+- `GOOS=darwin GOARCH=amd64 go build -o adfmac`
