@@ -6,10 +6,9 @@ package cmd
 import (
 	"adf-cli/adfweb"
 	"fmt"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
-
-	"github.com/spf13/cobra"
 )
 
 var installVersion string
@@ -30,12 +29,10 @@ var installCmd = &cobra.Command{
 		if err != nil {
 			log.Print(err)
 			fmt.Printf(
-				"Não foi possível fazer instalar a versão especificada. Erro: %v\n", err,
+				"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
 			)
 			return
 		}
-		installedVersions = append(installedVersions, installVersion)
-		fmt.Printf("Versão %s do ADF Web instalada com sucesso\n", installVersion)
 
 		err = adfweb.InstallADFWeb(RepositoryServerAddress, RepositoryServerPort, installVersion)
 		if err != nil {
