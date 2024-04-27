@@ -1,4 +1,4 @@
-module github.com/karlosdaniel451/adf-cli
+module adf-cli
 
 go 1.20
 

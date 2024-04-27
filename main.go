@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/karlosdaniel451/adf-cli/cmd"
+import cmd "adf-cli/cmd/cli"
 
 func main() {
 	cmd.Execute()
