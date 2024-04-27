@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -86,7 +87,21 @@ func InstallJVM(
 
 	downloadFilePath := fmt.Sprintf("jvm/%s/", version)
 
-	return extractZipFile(downloadFilePath+".zip", downloadFilePath)
+	err = extractZipFile(downloadFilePath+".zip", downloadFilePath)
+
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("java", "-version")
+
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(output))
 }
 
 func downloadADFWeb(
