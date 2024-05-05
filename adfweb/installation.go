@@ -102,6 +102,7 @@ func InstallJVM(
 	}
 
 	fmt.Println(string(output))
+	return nil
 }
 
 func downloadADFWeb(
@@ -147,7 +148,7 @@ func downloadJVM(
 ) error {
 	res, err := http.Get(
 		fmt.Sprintf(
-			"http://%s:%d/static/jvm/jvm-%s.zip",
+			"http://%s:%d/static/jvm/%s",
 			repositoryServerAddress, repositoryServerPort, versionJVM,
 		),
 	)
