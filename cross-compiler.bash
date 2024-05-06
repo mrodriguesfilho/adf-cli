@@ -15,16 +15,17 @@ do
 	platform_split=(${platform//\// })
 	GOOS=${platform_split[0]}
 	GOARCH=${platform_split[1]}
-	output_name=$package
-	output_dir="release/$GOOS-$GOARCH"
-
-	mkdir -p "$output_dir"
+	output_name="$package-$GOOS-$GOARCH"
 	
 	if [ $GOOS = "windows" ]; then
 		output_name+='.exe'
 	fi	
 
-	env GOOS=$GOOS GOARCH=$GOARCH go build -o "$output_dir/$output_name" $package
+	if [ $GOOS = "darwin" ]; then
+		output_name=$(echo "$output_name" | sed 's/darwin/mac/g')
+	fi
+
+	env GOOS=$GOOS GOARCH=$GOARCH go build -o "release/$output_name" $package
 	if [ $? -ne 0 ]; then
    		echo 'Erro ao buildar a versão $GOOS/$GOARCH! Abortando'
 		exit 1
