@@ -3,11 +3,6 @@
 package="adf-cli"
 platforms=("windows/amd64" "darwin/arm64" "darwin/amd64" "linux/amd64")
 
-if [[ -z "$package" ]]; then
-  echo "usage: $0 <package-name>"
-  exit 1
-fi
-
 rm -rf "release"
 
 for platform in "${platforms[@]}"
