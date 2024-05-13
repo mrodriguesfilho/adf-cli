@@ -24,20 +24,22 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// Default config parameters valus
+// Default config parameters values
 const (
 	adfVersion         = "0.0.1"
-	defaultWebPort int = 8050
+	defaultWebPort int = 5263
 
 	RepositoryServerAddress string = "localhost"
-	RepositoryServerPort    int    = 8001
+	RepositoryServerPort    int    = 5263
 
 	JvmDefaultVersion = "8.0"
+	adfDefaultDir     = ".adf"
 )
 
 var (
@@ -81,7 +83,6 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	fmt.Println("adf", adfVersion)
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -111,6 +112,14 @@ func initConfig() {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
+
+		adfFolderPath := filepath.Join(home, adfDefaultDir)
+		_, err = os.Stat(adfFolderPath)
+
+		if os.IsNotExist(err) {
+			err := os.Mkdir(adfFolderPath, 0700)
+			cobra.CheckErr(err)
+		}
 
 		// Search config in home directory with name ".adf" (without extension).
 		viper.AddConfigPath(home)
