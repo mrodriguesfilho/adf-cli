@@ -1,0 +1,10 @@
+{
+  "jvm": {
+    "downloadUrl": "http://localhost:5000/downloadjvm",
+    "version": "12.0.0"
+  },
+  "adfweb": {
+    "downloadUrl": "http://localhost:5000/downloadadf",
+    "version": "0.0.1"
+  }
+}

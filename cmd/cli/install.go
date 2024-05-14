@@ -7,7 +7,6 @@ import (
 	"adf-cli/adfweb"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log"
 )
 
@@ -24,26 +23,7 @@ var installCmd = &cobra.Command{
 	Versão 0.0.1 do ADF Web instalada com sucesso
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		err := adfweb.InstallJVM(RepositoryServerAddress, RepositoryServerPort, viper.GetString("JvmVersion"))
-		if err != nil {
-			log.Print(err)
-			fmt.Printf(
-				"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
-			)
-			return
-		}
-
-		err = adfweb.InstallADFWeb(RepositoryServerAddress, RepositoryServerPort, installVersion)
-		if err != nil {
-			log.Print(err)
-			fmt.Printf(
-				"Não foi possível fazer instalar a versão especificada. Erro: %v\n", err,
-			)
-			return
-		}
-		installedVersions = append(installedVersions, installVersion)
-		fmt.Printf("Versão %s do ADF Web instalada com sucesso\n", installVersion)
+		execute()
 	},
 }
 
@@ -62,4 +42,26 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func execute() {
+	err := adfweb.InstallJVM(RepositoryServerAddress, "8.0")
+	if err != nil {
+		log.Print(err)
+		fmt.Printf(
+			"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
+		)
+		return
+	}
+
+	err = adfweb.InstallADFWeb(RepositoryServerAddress, installVersion)
+	if err != nil {
+		log.Print(err)
+		fmt.Printf(
+			"Não foi possível fazer instalar a versão especificada. Erro: %v\n", err,
+		)
+		return
+	}
+	installedVersions = append(installedVersions, installVersion)
+	fmt.Printf("Versão %s do ADF Web instalada com sucesso\n", installVersion)
 }

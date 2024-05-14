@@ -8,14 +8,13 @@ import (
 
 func GetRemoteVersionsForDownload(
 	repositoryServerAddress string,
-	repositoryServerPort int,
 ) ([]string, error) {
 	remoteVersions := []string{}
 
 	resp, err := http.Get(
 		fmt.Sprintf(
-			"http://%s:%d/api/adfweb-version/",
-			repositoryServerAddress, repositoryServerPort,
+			"http://%s/api/adfweb-version/",
+			repositoryServerAddress,
 		),
 	)
 	if err != nil {
@@ -31,7 +30,6 @@ func GetRemoteVersionsForDownload(
 	if err != nil {
 		return nil, err
 	}
-	
 
 	return remoteVersions, nil
 }
@@ -41,4 +39,3 @@ func GetRemoteVersionsForDownload(
 
 // 	return installedVersions
 // }
-

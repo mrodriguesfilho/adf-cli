@@ -42,10 +42,9 @@ var ProgressBarOptions = []progressbar.Option{
 
 func InstallADFWeb(
 	repositoryServerAddress string,
-	repositoryServerPort int,
 	version string,
 ) error {
-	err := downloadADFWeb(repositoryServerAddress, repositoryServerPort, version)
+	err := downloadADFWeb(repositoryServerAddress, version)
 	if err != nil {
 		return err
 	}
@@ -57,7 +56,6 @@ func InstallADFWeb(
 
 func InstallJVM(
 	repositoryServerAddress string,
-	repositoryServerPort int,
 	version string,
 ) error {
 	fmt.Sprintf("Download JVM default version (%s)? y/n", version)
@@ -80,7 +78,7 @@ func InstallJVM(
 		version = versionInput
 	}
 
-	err := downloadJVM(repositoryServerAddress, repositoryServerPort, version)
+	err := downloadJVM(repositoryServerAddress, version)
 	if err != nil {
 		return err
 	}
@@ -107,13 +105,12 @@ func InstallJVM(
 
 func downloadADFWeb(
 	repositoryServerAddress string,
-	repositoryServerPort int,
 	version string,
 ) error {
 	res, err := http.Get(
 		fmt.Sprintf(
-			"http://%s:%d/static/adfweb/adfweb-%s.zip",
-			repositoryServerAddress, repositoryServerPort, version,
+			"http://%s/static/adfweb/adfweb-%s.zip",
+			repositoryServerAddress, version,
 		),
 	)
 	if err != nil {
@@ -143,13 +140,12 @@ func listAvailableJvmVersions() ([]string, error) {
 
 func downloadJVM(
 	repositoryServerAddress string,
-	repositoryServerPort int,
 	versionJVM string,
 ) error {
 	res, err := http.Get(
 		fmt.Sprintf(
-			"http://%s:%d/static/jvm/%s",
-			repositoryServerAddress, repositoryServerPort, versionJVM,
+			"http://%s/static/jvm/%s",
+			repositoryServerAddress, versionJVM,
 		),
 	)
 	if err != nil {

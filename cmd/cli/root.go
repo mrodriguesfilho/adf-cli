@@ -35,11 +35,9 @@ const (
 	adfVersion         = "0.0.1"
 	defaultWebPort int = 5263
 
-	RepositoryServerAddress string = "localhost"
-	RepositoryServerPort    int    = 5263
+	RepositoryServerAddress string = "localhost:5263"
 
-	JvmDefaultVersion = "8.0"
-	adfDefaultDir     = ".adf"
+	adfDefaultDir = ".adf"
 )
 
 var (

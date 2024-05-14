@@ -17,7 +17,6 @@ var listRemoteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		remoteVersions, err := adfweb.GetRemoteVersionsForDownload(
 			RepositoryServerAddress,
-			RepositoryServerPort,
 		)
 		if err != nil {
 			fmt.Println(err)
