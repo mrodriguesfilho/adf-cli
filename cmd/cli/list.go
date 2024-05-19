@@ -7,8 +7,10 @@ import (
 	"adf-cli/internal"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/spf13/cobra"
-	"net/http"
 )
 
 // listCmd represents the list command
@@ -39,36 +41,27 @@ func init() {
 }
 
 func getList() []internal.ServiceData {
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
 
-	serviceDataArr, err := downloadJson()
-
+	adfPreferenceFilePath = filepath.Join(home, adfDefaultDir, adfPreferencesFileName)
+	_, err = os.Stat(adfPreferenceFilePath)
 	if err != nil {
-		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Println("Mostrando versões locais:")
-		return internal.StaticServiceDataArr
+		cobra.CheckErr(err)
+		return nil
 	}
 
-	return serviceDataArr
-}
-
-func downloadJson() ([]internal.ServiceData, error) {
-
-	httpClient := &http.Client{}
-
-	res, err := httpClient.Get(RepositoryServerAddress)
-
+	serviceCollectionJsonData, err := os.ReadFile(adfPreferenceFilePath)
 	if err != nil {
-		return nil, err
+		cobra.CheckErr(err)
+		return nil
 	}
 
-	defer res.Body.Close()
-
-	var serviceDataArr []internal.ServiceData
-
-	jsonDecoder := json.NewDecoder(res.Body)
-	if err := jsonDecoder.Decode(&serviceDataArr); err != nil {
-		return nil, err
+	var preferences internal.Preferences
+	if err := json.Unmarshal(serviceCollectionJsonData, &preferences); err != nil {
+		cobra.CheckErr(err)
+		return nil
 	}
 
-	return serviceDataArr, nil
+	return preferences.Services
 }

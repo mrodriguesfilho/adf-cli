@@ -1,0 +1,15 @@
+{
+    "Services": [
+        {
+            "Name": "adfweb",
+            "Version": "0.0.1",
+            "DownloadUrl": "http://localhost:5000/downloadadf"
+        },
+        {
+            "Name": "jvm",
+            "Version": "12.0.0",
+            "DownloadUrl": "http://localhost:5000/downloadjvm"
+        }
+    ],
+    "Version": "0.0.1"
+}

@@ -22,12 +22,15 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"adf-cli/internal"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // Default config parameters values
@@ -35,9 +38,10 @@ const (
 	adfVersion         = "0.0.1"
 	defaultWebPort int = 5263
 
-	RepositoryServerAddress string = "localhost:5263"
-
-	adfDefaultDir = ".adf"
+	RepositoryServerAddress       string = "localhost:5263"
+	ServiceDatacCollectionAddress string = "https://drive.google.com/file/d/12x4FJFCMNV3KlqJTChFOjmoQMRvMg9Wh/view?usp=drive_link"
+	adfDefaultDir                        = ".adf"
+	adfPreferencesFileName               = "preferences.json"
 )
 
 var (
@@ -47,11 +51,7 @@ var (
 
 // Config parameters
 var webPort int = defaultWebPort
-var webWorkDir string
-var dataServerAddress string
-var dataServerPort int
-
-var cfgFile string
+var adfPreferenceFilePath string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -94,8 +94,6 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.adf.toml)")
-
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -103,56 +101,69 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
+	createApplicationFolder()
+	createPreferencesFile()
+}
+
+func createApplicationFolder() {
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+
+	adfPreferenceFilePath = filepath.Join(home, adfDefaultDir)
+	_, err = os.Stat(adfPreferenceFilePath)
+
+	if os.IsNotExist(err) {
+		err := os.Mkdir(adfPreferenceFilePath, 0700)
 		cobra.CheckErr(err)
+	}
+}
 
-		adfFolderPath := filepath.Join(home, adfDefaultDir)
-		_, err = os.Stat(adfFolderPath)
+func createPreferencesFile() {
 
-		if os.IsNotExist(err) {
-			err := os.Mkdir(adfFolderPath, 0700)
-			cobra.CheckErr(err)
-		}
+	adfPreferencesFilePath := filepath.Join(adfPreferenceFilePath, adfPreferencesFileName)
 
-		// Search config in home directory with name ".adf" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("toml")
-		viper.SetConfigName(".adf")
+	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
+		return
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	serviceDataArr, err := downloadLatestServiceDataFile()
 
-	viper.SetDefault("web.port", defaultWebPort)
-
-	rootCmd.Flags().Int("webPort", viper.GetInt("web.port"), "Número de porta TCP do ADF Web")
-	rootCmd.Flags().String("webWorkDir", viper.GetString("web.workdir"), "Diretório de trabalho do ADF Web")
-	rootCmd.Flags().String("dataServerAddress", viper.GetString("dataserver.address"), "Endereço do servidor de dados")
-	rootCmd.Flags().Int("dataServerPort", viper.GetInt("dataserver.port"), "Número de porta do servidor de dados")
-
-	viper.BindPFlag("web.port", rootCmd.Flags().Lookup("web.port"))
-	viper.BindPFlag("web.workdir", rootCmd.Flags().Lookup("web.workdir"))
-	viper.BindPFlag("dataserver.address", rootCmd.Flags().Lookup("dataserver.address"))
-	viper.BindPFlag("dataserver.port", rootCmd.Flags().Lookup("dataserver.port"))
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Usando arquivo de configuração:", viper.ConfigFileUsed()+"\n")
-
-		// Set config variables according to config value.
-		webPort = viper.GetInt("web.port")
-		webWorkDir = viper.GetString("web.workdir")
-		dataServerAddress = viper.GetString("dataserver.address")
-		dataServerPort = viper.GetInt("dataserver.port")
-
-		fmt.Printf(
-			"web.port: %d\nweb.workdir: %s\n"+
-				"dataserver.address: %s\ndataserver.port: %d\n\n",
-			webPort, webWorkDir, dataServerAddress, dataServerPort,
-		)
+	if err != nil {
+		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
+		fmt.Println("Utilizando as versões built in")
+		serviceDataArr, _ = internal.GetStaticServiceDataAsJson()
 	}
+
+	err = os.WriteFile(adfPreferencesFilePath, []byte(serviceDataArr), 0644)
+
+	if err != nil {
+		fmt.Printf("Não foi possível salvar o arquivo JSON com os dados de serviço. %v\n", err)
+	}
+}
+
+func downloadLatestServiceDataFile() (string, error) {
+
+	httpClient := &http.Client{}
+
+	res, err := httpClient.Get(ServiceDatacCollectionAddress)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var serviceDataCollection internal.Preferences
+
+	jsonDecoder := json.NewDecoder(res.Body)
+	if err := jsonDecoder.Decode(&serviceDataCollection); err != nil {
+		return "", err
+	}
+
+	return string(body), nil
 }
