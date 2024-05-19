@@ -35,11 +35,11 @@ var staticServiceDataArr = map[string]ServiceData{
 	"jvm:windows": {"21.0.3", "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_windows_hotspot_21.0.3_9.zip", "OpenJDK21U-jre_x64_windows_hotspot_21.0.3_9.zip", false},
 }
 
-const PreferencesVersion = "0.0.1"
+const PreferencesBuiltInVersion = "0.0.1"
 
 var staticPreferences = Preferences{
 	Services: staticServiceDataArr,
-	Version:  PreferencesVersion,
+	Version:  PreferencesBuiltInVersion,
 }
 
 func GetStaticServiceDataAsJson() (string, error) {

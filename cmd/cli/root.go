@@ -141,7 +141,7 @@ func createPreferencesFile() {
 
 	if err != nil {
 		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", internal.PreferencesVersion)
+		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", internal.PreferencesBuiltInVersion)
 		serviceDataArr, _ = internal.GetStaticServiceDataAsJson()
 	}
 
