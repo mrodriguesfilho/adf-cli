@@ -22,7 +22,7 @@ func extractFile(filename, destinationPath string) error {
 	switch ext {
 	case ".zip":
 		return extractZipFile(filename, destinationPath)
-	case ".tar.gz":
+	case ".gz":
 		return extractTarGz(filename, destinationPath)
 	default:
 		return fmt.Errorf("unsupported file format: %s", ext)
@@ -137,6 +137,10 @@ func extractTarGz(filePath, destinationPath string) error {
 				return err
 			}
 			defer outFile.Close()
+
+			if err := os.Chmod(targetPath, 0777); err != nil {
+				return fmt.Errorf("failed to set file permissions: %w", err)
+			}
 
 			// Copy the file contents
 			if _, err := io.Copy(outFile, tarReader); err != nil {

@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
 	"strings"
 	"time"
@@ -61,7 +60,7 @@ func InstallJVM() error {
 
 	jvmPreferenceData := internal.LoadedPreferences.Services["jvm:"+runtime.GOOS]
 
-	fmt.Printf("Download JVM default version (%s)? y/n", jvmPreferenceData.Version)
+	fmt.Printf("Download JVM default version (%v)? y/n \n", jvmPreferenceData.Version)
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
@@ -79,28 +78,42 @@ func InstallJVM() error {
 		versionInput = strings.TrimSpace(versionInput)
 	}
 
-	err := downloadJVM(jvmPreferenceData.DownloadUrl, jvmPreferenceData.Version)
+	err := downloadJVM(jvmPreferenceData)
 	if err != nil {
 		return err
 	}
 
-	downloadFilePath := fmt.Sprintf("jvm/%s/", jvmPreferenceData.Version)
+	destinationFilePath := internal.AdfDirectory + "/jvm/" + jvmPreferenceData.Version
+	saveFilePath := internal.AdfDirectory + "/jvm/" + jvmPreferenceData.Version + "/" + jvmPreferenceData.FileName
 
-	err = extractFile(jvmPreferenceData.FileName, downloadFilePath)
-
-	if err != nil {
-		return err
-	}
-
-	cmd := exec.Command("java", "-version")
-
-	output, err := cmd.CombinedOutput()
+	err = extractFile(saveFilePath, destinationFilePath)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(string(output))
+	// var javaPath string
+	// switch os := runtime.GOOS; os {
+	// case "darwin":
+	// 	javaPath = destinationFilePath + "/Contents/Home/bin/java"
+	// case "linux":
+	// 	javaPath = destinationFilePath + "/bin/java"
+	// case "windows":
+	// 	javaPath = destinationFilePath + "/bin/java.exe"
+	// default:
+	// 	fmt.Printf("Operating System: %s\n not found", os)
+	// }
+
+	// cmd := exec.Command(javaPath, "-version")
+
+	// output, err := cmd.CombinedOutput()
+
+	// if err != nil {
+	// 	return err
+	// }
+
+	// fmt.Println(string(output))
+
 	return nil
 }
 
@@ -139,12 +152,9 @@ func listAvailableJvmVersions() ([]string, error) {
 	return []string{"8.0, 11.0, 12.0"}, nil
 }
 
-func downloadJVM(
-	downloadUrl string,
-	versionJVM string,
-) error {
+func downloadJVM(jvmPreferencesData internal.ServiceData) error {
 
-	res, err := http.Get(downloadUrl)
+	res, err := http.Get(jvmPreferencesData.DownloadUrl)
 
 	if err != nil {
 		log.Println(err)
@@ -157,12 +167,25 @@ func downloadJVM(
 		return fmt.Errorf("request to download JVM failed with status %d", res.StatusCode)
 	}
 
-	f, _ := os.OpenFile(fmt.Sprintf("jvm-%s.zip", versionJVM), os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
+	saveFilePath := internal.AdfDirectory + "/jvm/" + jvmPreferencesData.Version
+
+	err = os.MkdirAll(saveFilePath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	saveFilePath += "/" + jvmPreferencesData.FileName
+
+	file, err := os.Create(saveFilePath)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
 
 	bar := progressbar.NewOptions64(res.ContentLength, ProgressBarOptions...)
-	bar.Describe("Baixando a JVM versão: " + versionJVM)
+	bar.Describe("Baixando a JVM versão: " + jvmPreferencesData.Version)
 
-	_, err = io.Copy(io.MultiWriter(f, bar), res.Body)
+	_, err = io.Copy(io.MultiWriter(file, bar), res.Body)
 	return err
 }

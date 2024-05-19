@@ -34,15 +34,6 @@ import (
 )
 
 // Default config parameters values
-const (
-	adfVersion         = "0.0.1"
-	defaultWebPort int = 5263
-
-	RepositoryServerAddress       string = "localhost:5263"
-	ServiceDatacCollectionAddress string = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json"
-	adfDefaultDir                        = ".adf"
-	adfPreferencesFileName               = "preferences.json"
-)
 
 var (
 	installedVersions []string
@@ -50,8 +41,7 @@ var (
 )
 
 // Config parameters
-var webPort int = defaultWebPort
-var adfDirectory string
+var webPort int = internal.DefaultWebPort
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -112,18 +102,18 @@ func createApplicationFolder() {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
-	adfDirectory = filepath.Join(home, adfDefaultDir)
-	_, err = os.Stat(adfDirectory)
+	internal.AdfDirectory = filepath.Join(home, internal.AdfDefaultDir)
+	_, err = os.Stat(internal.AdfDirectory)
 
 	if os.IsNotExist(err) {
-		err := os.Mkdir(adfDirectory, 0700)
+		err := os.Mkdir(internal.AdfDirectory, 0700)
 		cobra.CheckErr(err)
 	}
 }
 
 func readPreferencesFile() error {
 	viper.SetConfigName("preferences")
-	viper.AddConfigPath(adfDefaultDir)
+	viper.AddConfigPath(internal.AdfDirectory)
 	viper.SetConfigType("json")
 	err := viper.ReadInConfig()
 
@@ -140,7 +130,7 @@ func readPreferencesFile() error {
 
 func createPreferencesFile() {
 
-	adfPreferencesFilePath := filepath.Join(adfDirectory, adfPreferencesFileName)
+	adfPreferencesFilePath := filepath.Join(internal.AdfDirectory, internal.AdfPreferencesFileName)
 
 	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
 		cobra.CheckErr(err)
@@ -151,7 +141,7 @@ func createPreferencesFile() {
 
 	if err != nil {
 		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Println("Utilizando as versões built-in")
+		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", internal.PreferencesVersion)
 		serviceDataArr, _ = internal.GetStaticServiceDataAsJson()
 	}
 
@@ -167,7 +157,7 @@ func downloadLatestServiceDataFile() (string, error) {
 
 	httpClient := &http.Client{}
 
-	res, err := httpClient.Get(ServiceDatacCollectionAddress)
+	res, err := httpClient.Get(internal.ServiceDatacCollectionAddress)
 
 	if err != nil {
 		return "", err

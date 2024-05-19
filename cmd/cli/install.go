@@ -55,14 +55,4 @@ func execute() {
 		return
 	}
 
-	err = adfweb.InstallADFWeb(RepositoryServerAddress, installVersion)
-	if err != nil {
-		log.Print(err)
-		fmt.Printf(
-			"Não foi possível fazer instalar a versão especificada. Erro: %v\n", err,
-		)
-		return
-	}
-	installedVersions = append(installedVersions, installVersion)
-	fmt.Printf("Versão %s do ADF Web instalada com sucesso\n", installVersion)
 }

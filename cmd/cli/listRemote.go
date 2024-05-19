@@ -5,7 +5,9 @@ package cmd
 
 import (
 	"adf-cli/adfweb"
+	"adf-cli/internal"
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +18,7 @@ var listRemoteCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		remoteVersions, err := adfweb.GetRemoteVersionsForDownload(
-			RepositoryServerAddress,
+			internal.RepositoryServerAddress,
 		)
 		if err != nil {
 			fmt.Println(err)

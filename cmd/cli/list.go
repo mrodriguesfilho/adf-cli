@@ -20,6 +20,7 @@ var listCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceList := getList()
+		fmt.Printf("Service Data Version: %s \n", internal.LoadedPreferences.Version)
 		for key, serviceEntry := range serviceList {
 			fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
 		}
@@ -41,17 +42,15 @@ func init() {
 }
 
 func getList() map[string]internal.ServiceData {
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
 
-	adfDirectory = filepath.Join(home, adfDefaultDir, adfPreferencesFileName)
-	_, err = os.Stat(adfDirectory)
+	internal.AdfDirectory = filepath.Join(internal.AdfDirectory, internal.AdfPreferencesFileName)
+	_, err := os.Stat(internal.AdfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil
 	}
 
-	serviceCollectionJsonData, err := os.ReadFile(adfDirectory)
+	serviceCollectionJsonData, err := os.ReadFile(internal.AdfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil

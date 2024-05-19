@@ -10,8 +10,9 @@
       "request": "launch",
       "mode": "auto",
       "program": "./",
+      "console": "integratedTerminal",
       "args": [
-        "list"
+        "install"
       ]
     }
   ]
