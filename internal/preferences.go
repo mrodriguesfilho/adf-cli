@@ -5,30 +5,34 @@ import (
 )
 
 type Preferences struct {
-	Services []ServiceData
+	Services map[string]ServiceData
 	Version  string
 }
 
 type ServiceData struct {
-	Name        string
 	Version     string
 	DownloadUrl string
+	FileName    string
 }
 
-var staticServiceDataArr = []ServiceData{
-	{"adfweb", "0.0.1", "http://localhost:5000/downloadadf"},
-	{"jvm", "12.0.0", "http://localhost:5000/downloadjvm"},
+var LoadedPreferences Preferences
+
+var staticServiceDataArr = map[string]ServiceData{
+	"adfweb":      {"0.0.1", "http://localhost:5000/downloadadf", ""},
+	"jvm:darwin":  {"21.0.3", "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz", "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"},
+	"jvm:linux":   {"21.0.3", "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz", "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"},
+	"jvm:windows": {"21.0.3", "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz", "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"},
 }
 
-const PreferencesVersion = "0.0.1"
+const PreferencesVersion = "0.0.2"
 
-var preference = Preferences{
+var staticPreferences = Preferences{
 	Services: staticServiceDataArr,
 	Version:  PreferencesVersion,
 }
 
 func GetStaticServiceDataAsJson() (string, error) {
-	jsonData, err := json.MarshalIndent(preference, "", "    ")
+	jsonData, err := json.MarshalIndent(staticPreferences, "", "    ")
 
 	if err != nil {
 		return "", err

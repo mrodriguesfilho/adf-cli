@@ -30,6 +30,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // Default config parameters values
@@ -38,7 +39,7 @@ const (
 	defaultWebPort int = 5263
 
 	RepositoryServerAddress       string = "localhost:5263"
-	ServiceDatacCollectionAddress string = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json?token=GHSAT0AAAAAACQAGSTMZWAIQFPA2ZWJINS6ZSJTFEA"
+	ServiceDatacCollectionAddress string = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json"
 	adfDefaultDir                        = ".adf"
 	adfPreferencesFileName               = "preferences.json"
 )
@@ -50,7 +51,7 @@ var (
 
 // Config parameters
 var webPort int = defaultWebPort
-var adfPreferenceFilePath string
+var adfDirectory string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -101,25 +102,45 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	createApplicationFolder()
-	createPreferencesFile()
+	err := readPreferencesFile()
+	if err != nil {
+		createPreferencesFile()
+	}
 }
 
 func createApplicationFolder() {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
-	adfPreferenceFilePath = filepath.Join(home, adfDefaultDir)
-	_, err = os.Stat(adfPreferenceFilePath)
+	adfDirectory = filepath.Join(home, adfDefaultDir)
+	_, err = os.Stat(adfDirectory)
 
 	if os.IsNotExist(err) {
-		err := os.Mkdir(adfPreferenceFilePath, 0700)
+		err := os.Mkdir(adfDirectory, 0700)
 		cobra.CheckErr(err)
 	}
 }
 
+func readPreferencesFile() error {
+	viper.SetConfigName("preferences")
+	viper.AddConfigPath(adfDefaultDir)
+	viper.SetConfigType("json")
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		return err
+	}
+
+	if err := viper.Unmarshal(&internal.LoadedPreferences); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func createPreferencesFile() {
 
-	adfPreferencesFilePath := filepath.Join(adfPreferenceFilePath, adfPreferencesFileName)
+	adfPreferencesFilePath := filepath.Join(adfDirectory, adfPreferencesFileName)
 
 	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
 		cobra.CheckErr(err)
@@ -130,7 +151,7 @@ func createPreferencesFile() {
 
 	if err != nil {
 		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Println("Utilizando as versões built in")
+		fmt.Println("Utilizando as versões built-in")
 		serviceDataArr, _ = internal.GetStaticServiceDataAsJson()
 	}
 

@@ -1,15 +1,25 @@
 {
-    "Services": [
-        {
-            "Name": "adfweb",
+    "Services": {
+        "adfweb": {
             "Version": "0.0.1",
-            "DownloadUrl": "http://localhost:5000/downloadadf"
+            "DownloadUrl": "http://localhost:5000/downloadadf",
+            "FileName": ""
         },
-        {
-            "Name": "jvm",
-            "Version": "12.0.0",
-            "DownloadUrl": "http://localhost:5000/downloadjvm"
+        "jvm:darwin": {
+            "Version": "21.0.3",
+            "DownloadUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz",
+            "FileName": "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"
+        },
+        "jvm:linux": {
+            "Version": "21.0.3",
+            "DownloadUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz",
+            "FileName": "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"
+        },
+        "jvm:windows": {
+            "Version": "21.0.3",
+            "DownloadUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz",
+            "FileName": "OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz"
         }
-    ],
-    "Version": "0.0.2"
+    },
+    "Version": "0.0.3"
 }

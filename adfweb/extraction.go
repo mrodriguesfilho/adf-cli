@@ -5,7 +5,11 @@ import (
 	// "compress/gzip"
 	// "fmt"
 	// "io"
+
+	"archive/tar"
 	"archive/zip"
+	"compress/gzip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,9 +17,21 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func extractZipFile(zipPath, destPath string) error {
+func extractFile(filename, destinationPath string) error {
+	ext := filepath.Ext(filename)
+	switch ext {
+	case ".zip":
+		return extractZipFile(filename, destinationPath)
+	case ".tar.gz":
+		return extractTarGz(filename, destinationPath)
+	default:
+		return fmt.Errorf("unsupported file format: %s", ext)
+	}
+}
+
+func extractZipFile(filePath, destinationPath string) error {
 	// Open the zip file for reading
-	r, err := zip.OpenReader(zipPath)
+	r, err := zip.OpenReader(filePath)
 	if err != nil {
 		return err
 	}
@@ -45,7 +61,7 @@ func extractZipFile(zipPath, destPath string) error {
 		defer rc.Close()
 
 		// Create the corresponding file in the destination path
-		path := filepath.Join(destPath, file.Name)
+		path := filepath.Join(destinationPath, file.Name)
 		if file.FileInfo().IsDir() {
 			// Create directory if it doesn't exist
 			err = os.MkdirAll(path, os.ModePerm)
@@ -72,6 +88,62 @@ func extractZipFile(zipPath, destPath string) error {
 
 	// Finish the progress bar
 	bar.Finish()
+
+	return nil
+}
+
+func extractTarGz(filePath, destinationPath string) error {
+	// Open the .tar.gz file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Create a gzip reader
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return err
+	}
+	defer gzipReader.Close()
+
+	// Create a tar reader
+	tarReader := tar.NewReader(gzipReader)
+
+	// Extract each file from the tar archive
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break // End of archive
+		}
+		if err != nil {
+			return err
+		}
+
+		// Construct the full path for the extracted file
+		targetPath := destinationPath + "/" + header.Name
+
+		// Check if the file is a directory or a regular file
+		switch header.Typeflag {
+		case tar.TypeDir:
+			// Create directories
+			if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
+				return err
+			}
+		case tar.TypeReg:
+			// Create the file
+			outFile, err := os.Create(targetPath)
+			if err != nil {
+				return err
+			}
+			defer outFile.Close()
+
+			// Copy the file contents
+			if _, err := io.Copy(outFile, tarReader); err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }

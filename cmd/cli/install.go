@@ -6,8 +6,9 @@ package cmd
 import (
 	"adf-cli/adfweb"
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 var installVersion string
@@ -45,7 +46,7 @@ func init() {
 }
 
 func execute() {
-	err := adfweb.InstallJVM(RepositoryServerAddress, "8.0")
+	err := adfweb.InstallJVM()
 	if err != nil {
 		log.Print(err)
 		fmt.Printf(

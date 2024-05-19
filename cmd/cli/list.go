@@ -20,8 +20,8 @@ var listCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceList := getList()
-		for _, serviceEntry := range serviceList {
-			fmt.Printf("Service: %s | Version: %s \n", serviceEntry.Name, serviceEntry.Version)
+		for key, serviceEntry := range serviceList {
+			fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
 		}
 	},
 }
@@ -40,18 +40,18 @@ func init() {
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func getList() []internal.ServiceData {
+func getList() map[string]internal.ServiceData {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
-	adfPreferenceFilePath = filepath.Join(home, adfDefaultDir, adfPreferencesFileName)
-	_, err = os.Stat(adfPreferenceFilePath)
+	adfDirectory = filepath.Join(home, adfDefaultDir, adfPreferencesFileName)
+	_, err = os.Stat(adfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil
 	}
 
-	serviceCollectionJsonData, err := os.ReadFile(adfPreferenceFilePath)
+	serviceCollectionJsonData, err := os.ReadFile(adfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil

@@ -1,16 +1,19 @@
 package adfweb
 
 import (
+	"adf-cli/internal"
 	"bufio"
 	"fmt"
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 type ADFWebVersion struct {
@@ -54,12 +57,11 @@ func InstallADFWeb(
 	return extractZipFile(downloadFilePath+".zip", downloadFilePath)
 }
 
-func InstallJVM(
-	repositoryServerAddress string,
-	version string,
-) error {
-	fmt.Sprintf("Download JVM default version (%s)? y/n", version)
-	fmt.Println("Download JVM default version (%s)? y/n", version)
+func InstallJVM() error {
+
+	jvmPreferenceData := internal.LoadedPreferences.Services["jvm:"+runtime.GOOS]
+
+	fmt.Printf("Download JVM default version (%s)? y/n", jvmPreferenceData.Version)
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
@@ -75,17 +77,16 @@ func InstallJVM(
 		fmt.Println("Select version:")
 		versionInput, _ := reader.ReadString('\n')
 		versionInput = strings.TrimSpace(versionInput)
-		version = versionInput
 	}
 
-	err := downloadJVM(repositoryServerAddress, version)
+	err := downloadJVM(jvmPreferenceData.DownloadUrl, jvmPreferenceData.Version)
 	if err != nil {
 		return err
 	}
 
-	downloadFilePath := fmt.Sprintf("jvm/%s/", version)
+	downloadFilePath := fmt.Sprintf("jvm/%s/", jvmPreferenceData.Version)
 
-	err = extractZipFile(downloadFilePath+".zip", downloadFilePath)
+	err = extractFile(jvmPreferenceData.FileName, downloadFilePath)
 
 	if err != nil {
 		return err
@@ -139,15 +140,12 @@ func listAvailableJvmVersions() ([]string, error) {
 }
 
 func downloadJVM(
-	repositoryServerAddress string,
+	downloadUrl string,
 	versionJVM string,
 ) error {
-	res, err := http.Get(
-		fmt.Sprintf(
-			"http://%s/static/jvm/%s",
-			repositoryServerAddress, versionJVM,
-		),
-	)
+
+	res, err := http.Get(downloadUrl)
+
 	if err != nil {
 		log.Println(err)
 		return err
