@@ -25,6 +25,8 @@ do
    		echo 'Erro ao buildar a versão $GOOS/$GOARCH! Abortando'
 		exit 1
 	fi
+
+	echo "$output_name criado"
 done
 
 echo "Build completado com sucesso!"

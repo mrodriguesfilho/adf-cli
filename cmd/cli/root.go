@@ -23,7 +23,6 @@ package cmd
 
 import (
 	"adf-cli/internal"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,7 +38,7 @@ const (
 	defaultWebPort int = 5263
 
 	RepositoryServerAddress       string = "localhost:5263"
-	ServiceDatacCollectionAddress string = "https://drive.google.com/file/d/12x4FJFCMNV3KlqJTChFOjmoQMRvMg9Wh/view?usp=drive_link"
+	ServiceDatacCollectionAddress string = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json?token=GHSAT0AAAAAACQAGSTMZWAIQFPA2ZWJINS6ZSJTFEA"
 	adfDefaultDir                        = ".adf"
 	adfPreferencesFileName               = "preferences.json"
 )
@@ -123,6 +122,7 @@ func createPreferencesFile() {
 	adfPreferencesFilePath := filepath.Join(adfPreferenceFilePath, adfPreferencesFileName)
 
 	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
+		cobra.CheckErr(err)
 		return
 	}
 
@@ -137,6 +137,7 @@ func createPreferencesFile() {
 	err = os.WriteFile(adfPreferencesFilePath, []byte(serviceDataArr), 0644)
 
 	if err != nil {
+		cobra.CheckErr(err)
 		fmt.Printf("Não foi possível salvar o arquivo JSON com os dados de serviço. %v\n", err)
 	}
 }
@@ -155,13 +156,6 @@ func downloadLatestServiceDataFile() (string, error) {
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", err
-	}
-
-	var serviceDataCollection internal.Preferences
-
-	jsonDecoder := json.NewDecoder(res.Body)
-	if err := jsonDecoder.Decode(&serviceDataCollection); err != nil {
 		return "", err
 	}
 
