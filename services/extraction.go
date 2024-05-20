@@ -1,11 +1,6 @@
-package adfweb
+package services
 
 import (
-	// "archive/tar"
-	// "compress/gzip"
-	// "fmt"
-	// "io"
-
 	"archive/tar"
 	"archive/zip"
 	"compress/gzip"
@@ -17,11 +12,12 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func extractFile(filename, destinationPath string) error {
+func extractFile(filename, destinationPath string, progressBar []progressbar.Option) error {
+
 	ext := filepath.Ext(filename)
 	switch ext {
-	case ".zip":
-		return extractZipFile(filename, destinationPath)
+	case ".zip", ".war":
+		return extractZipFile(filename, destinationPath, progressBar)
 	case ".gz":
 		return extractTarGz(filename, destinationPath)
 	default:
@@ -29,7 +25,7 @@ func extractFile(filename, destinationPath string) error {
 	}
 }
 
-func extractZipFile(filePath, destinationPath string) error {
+func extractZipFile(filePath, destinationPath string, progressBar []progressbar.Option) error {
 	// Open the zip file for reading
 	r, err := zip.OpenReader(filePath)
 	if err != nil {
@@ -48,7 +44,7 @@ func extractZipFile(filePath, destinationPath string) error {
 	// 	totalSize,
 	// 	"Extraindo arquivos",
 	// )
-	bar := progressbar.NewOptions64(totalSize, ProgressBarOptions...)
+	bar := progressbar.NewOptions64(totalSize, progressBar...)
 	bar.Describe("Extraindo arquivos")
 
 	// Extract each file in the zip

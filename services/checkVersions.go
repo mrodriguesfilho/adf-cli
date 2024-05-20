@@ -1,4 +1,4 @@
-package adfweb
+package services
 
 import (
 	"encoding/json"
@@ -33,9 +33,3 @@ func GetRemoteVersionsForDownload(
 
 	return remoteVersions, nil
 }
-
-// func GetInstalledVersions() []string {
-// 	installedVersions := []string{}
-
-// 	return installedVersions
-// }

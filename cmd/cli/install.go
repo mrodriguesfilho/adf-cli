@@ -4,9 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"adf-cli/adfweb"
+	"adf-cli/services"
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -46,13 +45,22 @@ func init() {
 }
 
 func execute() {
-	err := adfweb.InstallJVM()
+
+	// err := services.InstallJVM()
+
+	// if err != nil {
+	// 	fmt.Printf(
+	// 		"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
+	// 	)
+	// 	return
+	// }
+
+	err := services.InstallHAPIFHIR()
+
 	if err != nil {
-		log.Print(err)
 		fmt.Printf(
-			"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
+			"Não foi possível fazer a instação da HAPIFHIR especificada. Erro: %v\n", err,
 		)
 		return
 	}
-
 }

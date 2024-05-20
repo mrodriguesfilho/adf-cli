@@ -1,5 +1,11 @@
 {
     "Services": {
+        "hapifhir": {
+            "Version": "7.0.2",
+            "DownloadUrl": "https://github.com/mrodriguesfilho/adf-cli/releases/download/v.0.2.0-beta/hapifhir.war",
+            "FileName": "hapifhir.war",
+            "Installed": false
+        },
         "jvm:darwin": {
             "Version": "21.0.3",
             "DownloadUrl": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_aarch64_mac_hotspot_21.0.3_9.tar.gz",
@@ -19,5 +25,5 @@
             "Installed": false
         }
     },
-    "Version": "0.0.2"
+    "Version": "0.0.1"
 }

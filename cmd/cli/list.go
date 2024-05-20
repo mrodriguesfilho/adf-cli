@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"adf-cli/internal"
+	"adf-cli/models"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -20,7 +20,7 @@ var listCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceList := getList()
-		fmt.Printf("Service Data Version: %s \n", internal.LoadedPreferences.Version)
+		fmt.Printf("Service Data Version: %s \n", models.LoadedPreferences.Version)
 		for key, serviceEntry := range serviceList {
 			fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
 		}
@@ -41,22 +41,22 @@ func init() {
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func getList() map[string]internal.ServiceData {
+func getList() map[string]models.ServiceData {
 
-	internal.AdfDirectory = filepath.Join(internal.AdfDirectory, internal.AdfPreferencesFileName)
-	_, err := os.Stat(internal.AdfDirectory)
+	models.AdfDirectory = filepath.Join(models.AdfDirectory, models.AdfPreferencesFileName)
+	_, err := os.Stat(models.AdfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil
 	}
 
-	serviceCollectionJsonData, err := os.ReadFile(internal.AdfDirectory)
+	serviceCollectionJsonData, err := os.ReadFile(models.AdfDirectory)
 	if err != nil {
 		cobra.CheckErr(err)
 		return nil
 	}
 
-	var preferences internal.Preferences
+	var preferences models.Preferences
 	if err := json.Unmarshal(serviceCollectionJsonData, &preferences); err != nil {
 		cobra.CheckErr(err)
 		return nil

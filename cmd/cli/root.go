@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"adf-cli/internal"
+	"adf-cli/models"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,16 +32,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-// Default config parameters values
-
-var (
-	installedVersions []string
-	usedVersion       string
-)
-
-// Config parameters
-var webPort int = internal.DefaultWebPort
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -102,18 +92,18 @@ func createApplicationFolder() {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
-	internal.AdfDirectory = filepath.Join(home, internal.AdfDefaultDir)
-	_, err = os.Stat(internal.AdfDirectory)
+	models.AdfDirectory = filepath.Join(home, models.AdfDefaultDir)
+	_, err = os.Stat(models.AdfDirectory)
 
 	if os.IsNotExist(err) {
-		err := os.Mkdir(internal.AdfDirectory, 0700)
+		err := os.Mkdir(models.AdfDirectory, 0700)
 		cobra.CheckErr(err)
 	}
 }
 
 func readPreferencesFile() error {
 	viper.SetConfigName("preferences")
-	viper.AddConfigPath(internal.AdfDirectory)
+	viper.AddConfigPath(models.AdfDirectory)
 	viper.SetConfigType("json")
 	err := viper.ReadInConfig()
 
@@ -121,7 +111,7 @@ func readPreferencesFile() error {
 		return err
 	}
 
-	if err := viper.Unmarshal(&internal.LoadedPreferences); err != nil {
+	if err := viper.Unmarshal(&models.LoadedPreferences); err != nil {
 		return err
 	}
 
@@ -130,7 +120,7 @@ func readPreferencesFile() error {
 
 func createPreferencesFile() {
 
-	adfPreferencesFilePath := filepath.Join(internal.AdfDirectory, internal.AdfPreferencesFileName)
+	adfPreferencesFilePath := filepath.Join(models.AdfDirectory, models.AdfPreferencesFileName)
 
 	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
 		cobra.CheckErr(err)
@@ -141,8 +131,8 @@ func createPreferencesFile() {
 
 	if err != nil {
 		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", internal.PreferencesBuiltInVersion)
-		serviceDataArr, _ = internal.GetStaticServiceDataAsJson()
+		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", models.PreferencesBuiltInVersion)
+		serviceDataArr, _ = models.GetStaticServiceDataAsJson()
 	}
 
 	err = os.WriteFile(adfPreferencesFilePath, []byte(serviceDataArr), 0644)
@@ -157,7 +147,7 @@ func downloadLatestServiceDataFile() (string, error) {
 
 	httpClient := &http.Client{}
 
-	res, err := httpClient.Get(internal.ServiceDatacCollectionAddress)
+	res, err := httpClient.Get(models.ServiceDatacCollectionAddress)
 
 	if err != nil {
 		return "", err

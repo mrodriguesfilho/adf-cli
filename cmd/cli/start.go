@@ -1,11 +1,13 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"adf-cli/models"
+	"bufio"
 	"fmt"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -14,9 +16,47 @@ import (
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Inicializa a versão em uso do ADF Web",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("ADF Web@%s executando em https://localhost:%d...\n", useVersion, webPort)
+
+		hapifhirFolder := models.AdfDirectory + "/hapifhir/hapifhir.war"
+
+		bashCmd := exec.Command("java", "-jar", hapifhirFolder)
+
+		stdout, err := bashCmd.StdoutPipe()
+		if err != nil {
+			fmt.Printf("Error obtaining stdout pipe: %s\n", err)
+			return
+		}
+
+		stderr, err := bashCmd.StderrPipe()
+		if err != nil {
+			fmt.Printf("Error obtaining stderr pipe: %s\n", err)
+			return
+		}
+
+		if err := bashCmd.Start(); err != nil {
+			fmt.Printf("Error starting command: %s\n", err)
+			return
+		}
+
+		stdoutScanner := bufio.NewScanner(stdout)
+		go func() {
+			for stdoutScanner.Scan() {
+				fmt.Printf("STDOUT: %s\n", stdoutScanner.Text())
+			}
+		}()
+
+		stderrScanner := bufio.NewScanner(stderr)
+		go func() {
+			for stderrScanner.Scan() {
+				fmt.Printf("STDERR: %s\n", stderrScanner.Text())
+			}
+		}()
+
+		if err := bashCmd.Wait(); err != nil {
+			fmt.Printf("Error waiting for command: %s\n", err)
+		}
 	},
 }
 

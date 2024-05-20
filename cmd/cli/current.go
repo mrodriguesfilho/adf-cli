@@ -1,12 +1,9 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -14,9 +11,8 @@ import (
 var currentCmd = &cobra.Command{
 	Use:   "current",
 	Short: "Obtem a versão do ADF Web utilizada atualmente",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Atualmente utilizando a versão %s do ADF Web\n", useVersion)
 	},
 }
 

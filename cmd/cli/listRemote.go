@@ -4,10 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"adf-cli/adfweb"
-	"adf-cli/internal"
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -17,21 +13,7 @@ var listRemoteCmd = &cobra.Command{
 	Short: "Lista as versões disponíveis do ADF Web para instalação",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		remoteVersions, err := adfweb.GetRemoteVersionsForDownload(
-			internal.RepositoryServerAddress,
-		)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("Versões disponíveis:")
-		for _, version := range remoteVersions {
-			fmt.Printf("ADF Web %s\n", version)
-		}
-		// fmt.Println("ADF Web 0.0.4 - latest")
-		// fmt.Println("ADF Web 0.0.3")
-		// fmt.Println("ADF Web 0.0.2")
-		// fmt.Println("ADF Web 0.0.1")
+
 	},
 }
 
