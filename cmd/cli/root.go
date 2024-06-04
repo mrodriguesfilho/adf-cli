@@ -24,6 +24,7 @@ package cmd
 import (
 	"adf-cli/models"
 	"fmt"
+	"github.com/mitchellh/mapstructure"
 	"io"
 	"net/http"
 	"os"
@@ -102,8 +103,8 @@ func createApplicationFolder() {
 }
 
 func readPreferencesFile() error {
-	viper.SetConfigName("preferences")
 	viper.AddConfigPath(models.AdfDirectory)
+	viper.SetConfigName("preferences")
 	viper.SetConfigType("json")
 	err := viper.ReadInConfig()
 
@@ -111,9 +112,13 @@ func readPreferencesFile() error {
 		return err
 	}
 
-	if err := viper.Unmarshal(&models.LoadedPreferences); err != nil {
+	rawPreferences := viper.AllSettings()
+	var preferences models.Preferences
+	if err := mapstructure.Decode(rawPreferences, &preferences); err != nil {
 		return err
 	}
+
+	models.LoadedPreferences = getInUseVersion(preferences)
 
 	return nil
 }
@@ -161,4 +166,15 @@ func downloadLatestServiceDataFile() (string, error) {
 	}
 
 	return string(body), nil
+}
+
+func getInUseVersion(preferences models.Preferences) models.Bundle {
+
+	for _, bundle := range preferences.Bundles {
+		if bundle.InUse {
+			return bundle
+		}
+	}
+
+	return models.Bundle{}
 }

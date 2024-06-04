@@ -19,10 +19,15 @@ var listCmd = &cobra.Command{
 	Short: "Exibe as versões disponíveis dos serviços relacinados ao ADF",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		serviceList := getList()
-		fmt.Printf("Service Data Version: %s \n", models.LoadedPreferences.Version)
-		for key, serviceEntry := range serviceList {
-			fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
+		bundleArr := getBundles()
+		for _, bundle := range bundleArr {
+			fmt.Println("-------")
+			fmt.Printf("Service Data Version: %s \n", bundle.Version)
+			fmt.Printf("In Use: %v \n", bundle.InUse)
+			for key, serviceEntry := range bundle.Services {
+				fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
+			}
+			fmt.Println("-------")
 		}
 	},
 }
@@ -41,7 +46,7 @@ func init() {
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func getList() map[string]models.ServiceData {
+func getBundles() []models.Bundle {
 
 	models.AdfDirectory = filepath.Join(models.AdfDirectory, models.AdfPreferencesFileName)
 	_, err := os.Stat(models.AdfDirectory)
@@ -62,5 +67,5 @@ func getList() map[string]models.ServiceData {
 		return nil
 	}
 
-	return preferences.Services
+	return preferences.Bundles
 }
