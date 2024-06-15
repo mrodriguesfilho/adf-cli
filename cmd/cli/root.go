@@ -23,12 +23,14 @@ package cmd
 
 import (
 	"adf-cli/models"
+	"errors"
 	"fmt"
-	"github.com/mitchellh/mapstructure"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/mitchellh/mapstructure"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -119,6 +121,9 @@ func readPreferencesFile() error {
 	}
 
 	models.LoadedPreferences = getInUseVersion(preferences)
+	if models.LoadedPreferences == nil {
+		return errors.New("failed to retrieve data from json file")
+	}
 
 	return nil
 }
@@ -128,8 +133,10 @@ func createPreferencesFile() {
 	adfPreferencesFilePath := filepath.Join(models.AdfDirectory, models.AdfPreferencesFileName)
 
 	if _, err := os.Stat(adfPreferencesFilePath); err == nil {
-		cobra.CheckErr(err)
-		return
+		if err := os.Remove(adfPreferencesFilePath); err != nil {
+			cobra.CheckErr(fmt.Errorf("failed to delete existing preferences file: %w", err))
+			return
+		}
 	}
 
 	serviceDataArr, err := downloadLatestServiceDataFile()
@@ -168,13 +175,13 @@ func downloadLatestServiceDataFile() (string, error) {
 	return string(body), nil
 }
 
-func getInUseVersion(preferences models.Preferences) models.Bundle {
+func getInUseVersion(preferences models.Preferences) *models.Bundle {
 
 	for _, bundle := range preferences.Bundles {
 		if bundle.InUse {
-			return bundle
+			return &bundle
 		}
 	}
 
-	return models.Bundle{}
+	return nil
 }

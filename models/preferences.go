@@ -21,7 +21,7 @@ type ServiceData struct {
 	Installed   bool
 }
 
-var LoadedPreferences Bundle
+var LoadedPreferences *Bundle
 var AdfDirectory string
 
 const (

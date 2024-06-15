@@ -46,16 +46,16 @@ func init() {
 
 func execute() {
 
-	// err := services.InstallJVM()
+	err := services.InstallJVM()
 
-	// if err != nil {
-	// 	fmt.Printf(
-	// 		"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
-	// 	)
-	// 	return
-	// }
+	if err != nil {
+		fmt.Printf(
+			"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
+		)
+		return
+	}
 
-	err := services.InstallHAPIFHIR()
+	err = services.InstallHAPIFHIR()
 
 	if err != nil {
 		fmt.Printf(
