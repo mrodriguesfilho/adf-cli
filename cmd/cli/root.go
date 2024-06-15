@@ -121,7 +121,7 @@ func readPreferencesFile() error {
 	}
 
 	models.LoadedPreferences = getInUseVersion(preferences)
-	if models.LoadedPreferences == nil {
+	if !models.LoadedPreferences.InUse {
 		return errors.New("failed to retrieve data from json file")
 	}
 
@@ -153,6 +153,8 @@ func createPreferencesFile() {
 		cobra.CheckErr(err)
 		fmt.Printf("Não foi possível salvar o arquivo JSON com os dados de serviço. %v\n", err)
 	}
+
+	readPreferencesFile()
 }
 
 func downloadLatestServiceDataFile() (string, error) {
@@ -175,13 +177,13 @@ func downloadLatestServiceDataFile() (string, error) {
 	return string(body), nil
 }
 
-func getInUseVersion(preferences models.Preferences) *models.Bundle {
+func getInUseVersion(preferences models.Preferences) models.Bundle {
 
 	for _, bundle := range preferences.Bundles {
 		if bundle.InUse {
-			return &bundle
+			return bundle
 		}
 	}
 
-	return nil
+	return models.Bundle{}
 }
