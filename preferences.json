@@ -30,5 +30,6 @@
             "Version": "0.0.1",
             "InUse": true
         }
-    ]
+    ],
+    "AdfHomeDir": ".adf"
 }

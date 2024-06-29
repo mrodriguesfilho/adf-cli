@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"adf-cli/services"
+	"adf-cli/internal/services"
 	"fmt"
 
 	"github.com/spf13/cobra"

@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"adf-cli/models"
+	"adf-cli/internal/models"
 	"encoding/json"
 	"fmt"
 	"os"

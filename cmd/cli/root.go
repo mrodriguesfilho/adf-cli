@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"adf-cli/models"
+	"adf-cli/internal/models"
 	"errors"
 	"fmt"
 	"io"
@@ -120,9 +120,13 @@ func readPreferencesFile() error {
 		return err
 	}
 
-	models.LoadedPreferences = getInUseVersion(preferences)
-	if !models.LoadedPreferences.InUse {
+	models.LoadedBundle = getInUseVersion(preferences)
+	if !models.LoadedBundle.InUse {
 		return errors.New("failed to retrieve data from json file")
+	}
+
+	if !models.LoadedBundle.Validate() {
+		return errors.New("bundle has invalid data in json file")
 	}
 
 	return nil
