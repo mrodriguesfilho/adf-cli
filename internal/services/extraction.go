@@ -8,7 +8,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-
+	"strings"
+	
 	"github.com/schollz/progressbar/v3"
 )
 
@@ -32,7 +33,8 @@ func extractZipFile(filePath, destinationPath string, progressBar []progressbar.
 		return err
 	}
 	defer r.Close()
-
+	
+	deleteZipExtractionDirectoryRoot(r.File, destinationPath)
 	// Calculate the total size of all the files in the zip
 	var totalSize int64
 	for _, file := range r.File {
@@ -147,3 +149,25 @@ func extractTarGz(filePath, destinationPath string) error {
 
 	return nil
 }
+
+func deleteZipExtractionDirectoryRoot(zipFiles []*zip.File, destinationPath string) error {
+
+	var rootFolder string
+	for _, file := range zipFiles {
+		if file.FileInfo().IsDir() {
+			rootFolder = strings.Split(file.Name, "/")[0]
+			break
+		}
+	}
+
+	rootFolderPath := filepath.Join(destinationPath, rootFolder)
+	if _, err := os.Stat(rootFolderPath); !os.IsNotExist(err) {
+		err = os.RemoveAll(rootFolderPath)
+		if err != nil {
+			return fmt.Errorf("failed to delete existing directory: %v", err)
+		}
+	}
+
+	return nil
+}
+
