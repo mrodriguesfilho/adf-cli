@@ -13,7 +13,7 @@ var LoadedBundle Bundle
 var AdfDirectory string
 
 const (
-	AdfReleaseVersion             = "0.0.5-beta.1"
+	AdfReleaseVersion             = "0.0.5-beta2"
 	PreferencesBuiltInVersion     = "0.0.1"
 	HapiFhirDefaultPort           = ":8080"
 	ServiceDatacCollectionAddress = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json"
