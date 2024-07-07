@@ -23,7 +23,6 @@ var listCmd = &cobra.Command{
 		for _, bundle := range bundleArr {
 			fmt.Println("-------")
 			fmt.Printf("Service Data Version: %s \n", bundle.Version)
-			fmt.Printf("In Use: %v \n", bundle.InUse)
 			for key, serviceEntry := range bundle.Services {
 				fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
 			}

@@ -34,10 +34,10 @@ var hapiFhirProgressBarOptions = []progressbar.Option{
 	}),
 }
 
-func InstallHAPIFHIR() error {
+func InstallHAPIFHIR(installDir string, installVersion string, bundleToUse models.Bundle) error {
 
-	hapifhirServiceData := models.LoadedBundle.Services["hapifhir"]
-	err := downloadHAPIFHIR(hapifhirServiceData)
+	hapifhirServiceData := bundleToUse.Services["hapifhir"]
+	err := downloadHAPIFHIR(installDir, hapifhirServiceData)
 
 	if err != nil {
 		log.Println(err)
@@ -47,7 +47,7 @@ func InstallHAPIFHIR() error {
 	return nil
 }
 
-func downloadHAPIFHIR(hapifhirePreferencesData models.ServiceData) error {
+func downloadHAPIFHIR(installDir string, hapifhirePreferencesData models.ServiceData) error {
 
 	req, _ := http.NewRequest("GET", hapifhirePreferencesData.DownloadUrl, nil)
 	req.Header.Add("Accept", "application/octet-stream")
@@ -64,7 +64,7 @@ func downloadHAPIFHIR(hapifhirePreferencesData models.ServiceData) error {
 		return fmt.Errorf("request to download HAPIFHIR failed with status %d", res.StatusCode)
 	}
 
-	saveFilePath := models.AdfDirectory + "/hapifhir/"
+	saveFilePath := installDir + "/hapifhir/"
 
 	err = os.MkdirAll(saveFilePath, os.ModePerm)
 	if err != nil {

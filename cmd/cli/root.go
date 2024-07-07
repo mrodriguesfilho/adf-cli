@@ -30,8 +30,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mitchellh/mapstructure"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -92,11 +90,16 @@ func initConfig() {
 }
 
 func createApplicationFolder() {
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
 
-	models.AdfDirectory = filepath.Join(home, models.AdfDefaultDir)
-	_, err = os.Stat(models.AdfDirectory)
+	if os.Getenv("ADF_HOME") != "" {
+		models.AdfDirectory = os.Getenv("ADF_HOME")
+	} else {
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+		models.AdfDirectory = filepath.Join(home, models.AdfDefaultDir)
+	}
+
+	_, err := os.Stat(models.AdfDirectory)
 
 	if os.IsNotExist(err) {
 		err := os.Mkdir(models.AdfDirectory, 0700)
@@ -114,19 +117,15 @@ func readPreferencesFile() error {
 		return err
 	}
 
-	rawPreferences := viper.AllSettings()
 	var preferences models.Preferences
-	if err := mapstructure.Decode(rawPreferences, &preferences); err != nil {
+	if err := viper.Unmarshal(&preferences); err != nil {
 		return err
 	}
 
-	models.LoadedBundle = getInUseVersion(preferences)
-	if !models.LoadedBundle.InUse {
-		return errors.New("failed to retrieve data from json file")
-	}
-
-	if !models.LoadedBundle.Validate() {
-		return errors.New("bundle has invalid data in json file")
+	models.LoadedPreferences = preferences
+	err = ValidateBundles(preferences)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -158,7 +157,9 @@ func createPreferencesFile() {
 		fmt.Printf("Não foi possível salvar o arquivo JSON com os dados de serviço. %v\n", err)
 	}
 
-	readPreferencesFile()
+	if err = readPreferencesFile(); err != nil {
+		fmt.Println("Não foi possível ler o arquivo preferences")
+	}
 }
 
 func downloadLatestServiceDataFile() (string, error) {
@@ -181,13 +182,13 @@ func downloadLatestServiceDataFile() (string, error) {
 	return string(body), nil
 }
 
-func getInUseVersion(preferences models.Preferences) models.Bundle {
+func ValidateBundles(preferences models.Preferences) error {
 
 	for _, bundle := range preferences.Bundles {
-		if bundle.InUse {
-			return bundle
+		if !bundle.Validate() {
+			return errors.New("bundle has invalid data in json file")
 		}
 	}
 
-	return models.Bundle{}
+	return nil
 }

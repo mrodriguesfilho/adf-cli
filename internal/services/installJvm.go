@@ -35,36 +35,17 @@ var JvmProgressBarOptions = []progressbar.Option{
 	}),
 }
 
-func InstallJVM() error {
+func InstallJVM(installDir string, installVersion string, bundleToUse models.Bundle) error {
 
-	jvmPreferenceData := models.LoadedBundle.Services["jvm:"+runtime.GOOS]
-
-	// fmt.Printf("Download JVM default version (%v)? y/n \n", jvmPreferenceData.Version)
-	// reader := bufio.NewReader(os.Stdin)
-	// input, _ := reader.ReadString('\n')
-	// input = strings.TrimSpace(input)
-
-	// if input == "n" {
-	// 	availableVersions, _ := listAvailableJvmVersions()
-
-	// 	fmt.Println("Pick from the available versions:")
-	// 	for _, v := range availableVersions {
-	// 		fmt.Println("-", v)
-	// 	}
-
-	// 	fmt.Println("Select version:")
-	// 	versionInput, _ := reader.ReadString('\n')
-	// 	versionInput = strings.TrimSpace(versionInput)
-	// }
-
-	err := downloadJVM(jvmPreferenceData)
+	jvmPreferenceData := bundleToUse.Services["jvm:"+runtime.GOOS]
+	err := downloadJVM(installDir, jvmPreferenceData)
 
 	if err != nil {
 		return err
 	}
 
-	destinationFilePath := models.AdfDirectory + "/jvm/" + jvmPreferenceData.Version
-	saveFilePath := models.AdfDirectory + "/jvm/" + jvmPreferenceData.Version + "/" + jvmPreferenceData.FileName
+	destinationFilePath := installDir + "/jvm/" + jvmPreferenceData.Version
+	saveFilePath := installDir + "/jvm/" + jvmPreferenceData.Version + "/" + jvmPreferenceData.FileName
 
 	err = extractFile(saveFilePath, destinationFilePath, JvmProgressBarOptions)
 
@@ -96,7 +77,7 @@ func InstallJVM() error {
 	return nil
 }
 
-func downloadJVM(jvmPreferencesData models.ServiceData) error {
+func downloadJVM(installDir string, jvmPreferencesData models.ServiceData) error {
 
 	res, err := http.Get(jvmPreferencesData.DownloadUrl)
 
@@ -111,7 +92,7 @@ func downloadJVM(jvmPreferencesData models.ServiceData) error {
 		return fmt.Errorf("request to download JVM failed with status %d", res.StatusCode)
 	}
 
-	saveFilePath := models.AdfDirectory + "/jvm/" + jvmPreferencesData.Version
+	saveFilePath := installDir + "/jvm/" + jvmPreferencesData.Version
 
 	err = os.MkdirAll(saveFilePath, os.ModePerm)
 	if err != nil {

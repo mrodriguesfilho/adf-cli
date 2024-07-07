@@ -5,7 +5,6 @@ import "strings"
 type Bundle struct {
 	Services map[string]ServiceData
 	Version  string
-	InUse    bool
 }
 
 type ServiceData struct {
@@ -16,9 +15,14 @@ type ServiceData struct {
 }
 
 func (b Bundle) Validate() bool {
+
+	if b.Services == nil {
+		return false
+	}
+
 	for _, service := range b.Services {
 
-		if service.DownloadUrl == "" || !strings.HasPrefix(service.DownloadUrl, "http://") || !strings.HasPrefix(service.DownloadUrl, "https://") {
+		if service.DownloadUrl == "" || (!strings.HasPrefix(service.DownloadUrl, "http://") && !strings.HasPrefix(service.DownloadUrl, "https://")) {
 			return false
 		}
 
