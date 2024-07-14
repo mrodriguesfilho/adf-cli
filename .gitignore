@@ -236,3 +236,4 @@ tags
 [._]*.un~
 
 .idea
+.DS_Store

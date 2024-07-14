@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var startVersion string
+
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
@@ -19,7 +21,11 @@ var startCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		hapifhirFolder := models.AdfDirectory + "/hapifhir/hapifhir.war"
+		if startVersion == "" {
+			startVersion = models.PreferencesBuiltInVersion
+		}
+
+		hapifhirFolder := models.AdfDirectory + "/" + startVersion + "/hapifhir/hapifhir.war"
 
 		bashCmd := exec.Command("java", "-jar", hapifhirFolder)
 
@@ -62,14 +68,5 @@ var startCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(startCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	startCmd.Flags().StringVarP(&startVersion, "version", "v", "", "Versão do Bundle ADF a ser iniciada")
 }
