@@ -37,7 +37,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "adf",
-	Short: "Ferramenta de linha de comando para funcionalidades administrativas do Ambiente de Design FIHR (ADF)",
+	Short: "Ferramenta administrativa do Ambiente de Design FHIR (ADF)",
 	Long:  ``,
 	Example: `
 	$ adf install --version 0.0.1

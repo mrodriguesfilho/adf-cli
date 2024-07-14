@@ -5,6 +5,8 @@ platforms=("windows/amd64" "darwin/arm64" "darwin/amd64" "linux/amd64")
 
 rm -rf "release"
 
+echo "Builder iniciado!"
+
 for platform in "${platforms[@]}"
 do
 	platform_split=(${platform//\// })

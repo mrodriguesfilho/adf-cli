@@ -35,7 +35,9 @@ var JvmProgressBarOptions = []progressbar.Option{
 	}),
 }
 
-func InstallJVM(installDir string, installVersion string, bundleToUse models.Bundle) error {
+type JVM struct{}
+
+func (i JVM) Install(installDir string, installVersion string, bundleToUse models.Bundle) error {
 
 	jvmPreferenceData := bundleToUse.Services["jvm:"+runtime.GOOS]
 	err := downloadJVM(installDir, jvmPreferenceData)
@@ -75,6 +77,10 @@ func InstallJVM(installDir string, installVersion string, bundleToUse models.Bun
 
 	// fmt.Println(string(output))
 	return nil
+}
+
+func (i JVM) ServiceName() string {
+	return "JVM"
 }
 
 func downloadJVM(installDir string, jvmPreferencesData models.ServiceData) error {

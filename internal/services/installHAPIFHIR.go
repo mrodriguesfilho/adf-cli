@@ -34,7 +34,9 @@ var hapiFhirProgressBarOptions = []progressbar.Option{
 	}),
 }
 
-func InstallHAPIFHIR(installDir string, installVersion string, bundleToUse models.Bundle) error {
+type HAPIFHIR struct{}
+
+func (i HAPIFHIR) Install(installDir string, installVersion string, bundleToUse models.Bundle) error {
 
 	hapifhirServiceData := bundleToUse.Services["hapifhir"]
 	err := downloadHAPIFHIR(installDir, hapifhirServiceData)
@@ -45,6 +47,10 @@ func InstallHAPIFHIR(installDir string, installVersion string, bundleToUse model
 	}
 
 	return nil
+}
+
+func (i HAPIFHIR) ServiceName() string {
+	return "HAPIFHIR"
 }
 
 func downloadHAPIFHIR(installDir string, hapifhirePreferencesData models.ServiceData) error {

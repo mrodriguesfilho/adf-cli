@@ -65,25 +65,21 @@ func execute() {
 
 	installDir = filepath.Join(models.AdfDirectory, installVersion)
 
-	err := services.InstallJVM(installDir, installVersion, bundle)
-
-	if err != nil {
-		fmt.Printf(
-			"Não foi possível fazer a instação da JVM especificada. Erro: %v\n", err,
-		)
-		return
+	installStrategies := []services.InstallStrategy{
+		services.JVM{},
+		services.HAPIFHIR{},
+		services.HapifhirValidator{},
 	}
 
-	err = services.InstallHAPIFHIR(installDir, installVersion, bundle)
-
-	if err != nil {
-		fmt.Printf(
-			"Não foi possível fazer a instação da HAPIFHIR especificada. Erro: %v\n", err,
-		)
-		return
+	for _, strategy := range installStrategies {
+		err := strategy.Install(installDir, installVersion, bundle)
+		if err != nil {
+			fmt.Printf("Não foi possível fazer a instalação %v. Erro: %v\n", strategy.ServiceName(), err)
+			return
+		}
 	}
 
-	err = WriteToReferences(installVersion, installDir)
+	err := WriteToReferences(installVersion, installDir)
 	if err != nil {
 		fmt.Printf("falha ao escrever o novo arquivo de referencias. Erro: %v", err)
 	}
