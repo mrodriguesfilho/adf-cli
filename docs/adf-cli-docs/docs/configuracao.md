@@ -1,30 +1,33 @@
 # Configuração
 
-Esta ferramenta utiliza o arquivo de configuração .adf.toml para definir valores para variáveis de configuração. O local default é seguinte para cada plataforma:
+Esta ferramenta utiliza os arquivos de configuração references.json e preferences.json para definir valores para variáveis de configuração. O local default é seguinte para cada plataforma:
 
-- GNU/Linux e macOS: $HOME
-- Windows: %USERPROFILE%
+- GNU/Linux e macOS: $HOME/.adf
+- Windows: %USERPROFILE%/.adf
+
+Preferences.json
+- O arquivo contem uma coleção de urls para download das ferramentas necessárias para o adf. Separadas e indicas por versão
+
+References.json
+- O arquivo contem uma coleção de cada pacote instalado na maquina do usuário, separado por versão. Permite instalar as versões
+do adf em diferentes locais no disco.
 
 ## Opções de configuração:
 
-- web.port: int. Número de porta TCP a ser utilizada pelo ADF Web. Default: 8051
-- web.workdir: string. Diretório de trabalho do ADF Web
+Version: versão do pacote com as ferramentas necessarias para usar o adf
 
-- services.terminology.address: string. Endereço do servidor de dados. Default: nenhum
-- services.terminology.port: int. Número de porta do servidor de dados. Default: nenhum
-- services.terminology.certificate: string. Nome de arquivo de certificado digital para o serviço de terminologias. Default: nenhum
+DirectoryPath: Caminho no disco em que a versão especifica do adf está instalado
 
 ## Exemplo de arquivo de configuração
 
-```toml
-[web]
-port = 8051
-workdir = "~/adf"
+```JSON
+{
+  "InstalledBundles": [
+    {
+      "Version": "0.0.1", 
+      "DirectoryPath": "/Users/mrf/.adf/0.0.1"
+    }
+  ]
+}
 
-[services]
-
-[services.terminology]
-address = "https://www.fhir-terminology.com/data/"
-port = 433
-certificate = "~/adf/terminologies-certificate.pem
 ```

@@ -27,7 +27,7 @@ theme:
   font:
     text: Roboto
   
-repo_url: https://github.com/karlosdaniel451/adf-cli
+repo_url: https://github.com/mrodriguesfilho/adf-cli
 
 
 markdown_extensions:

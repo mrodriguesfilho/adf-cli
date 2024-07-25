@@ -15,7 +15,7 @@ Veja as plataformas suportadas [aqui](/#plataformas-suportadas).
 
 2.  Clone o repositório do código-fonte com o Git:
 ```shell
-git clone https://github.com/karlosdaniel451/adf-cli
+git clone https://github.com/mrodriguesfilho/adf-cli
 ```
 
 3.   Vá até o novo diretório criado:
