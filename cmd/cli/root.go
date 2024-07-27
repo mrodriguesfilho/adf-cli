@@ -23,12 +23,15 @@ package cmd
 
 import (
 	"adf-cli/internal/models"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -83,10 +86,15 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	createApplicationFolder()
-	err := readPreferencesFile()
+	preferences, err := readLocalPreferencesFile()
+
 	if err != nil {
 		createPreferencesFile()
 	}
+
+	validateLatestPreferences(preferences)
+
+	models.LoadedPreferences = preferences
 }
 
 func createApplicationFolder() {
@@ -107,28 +115,27 @@ func createApplicationFolder() {
 	}
 }
 
-func readPreferencesFile() error {
+func readLocalPreferencesFile() (models.Preferences, error) {
 	viper.AddConfigPath(models.AdfDirectory)
 	viper.SetConfigName("preferences")
 	viper.SetConfigType("json")
 	err := viper.ReadInConfig()
 
 	if err != nil {
-		return err
+		return models.Preferences{}, err
 	}
 
 	var preferences models.Preferences
 	if err := viper.Unmarshal(&preferences); err != nil {
-		return err
+		return models.Preferences{}, err
 	}
 
-	models.LoadedPreferences = preferences
 	err = ValidateBundles(preferences)
 	if err != nil {
-		return err
+		return models.Preferences{}, err
 	}
 
-	return nil
+	return preferences, nil
 }
 
 func createPreferencesFile() {
@@ -146,7 +153,7 @@ func createPreferencesFile() {
 
 	if err != nil {
 		fmt.Println("Não foi possível baixar a lista das versões mais atualizadas do serviço.")
-		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", models.PreferencesBuiltInVersion)
+		fmt.Printf("Utilizando as versões built-in da versão %v do ADF \n", models.PreferencesLatestVersion)
 		serviceDataArr, _ = models.GetStaticServiceDataAsJson()
 	}
 
@@ -157,7 +164,7 @@ func createPreferencesFile() {
 		fmt.Printf("Não foi possível salvar o arquivo JSON com os dados de serviço. %v\n", err)
 	}
 
-	if err = readPreferencesFile(); err != nil {
+	if _, err = readLocalPreferencesFile(); err != nil {
 		fmt.Println("Não foi possível ler o arquivo preferences")
 	}
 }
@@ -191,4 +198,46 @@ func ValidateBundles(preferences models.Preferences) error {
 	}
 
 	return nil
+}
+
+func validateLatestPreferences(preferences models.Preferences) {
+
+	serviceDataArr, err := downloadLatestServiceDataFile()
+
+	if err != nil {
+		return
+	}
+
+	var latestPreferences models.Preferences
+	json.Unmarshal([]byte(serviceDataArr), &latestPreferences)
+
+	if versionGreaterThan(latestPreferences.LatestVersion, preferences.LatestVersion) {
+		createPreferencesFile()
+	}
+}
+
+func versionGreaterThan(v1, v2 string) bool {
+	v1Parts := strings.Split(v1, ".")
+	v2Parts := strings.Split(v2, ".")
+
+	if len(v1Parts) != 3 || len(v2Parts) != 3 {
+		return true
+	}
+
+	for i := 0; i < 3; i++ {
+		v1Int, err1 := strconv.Atoi(v1Parts[i])
+		v2Int, err2 := strconv.Atoi(v2Parts[i])
+
+		if err1 != nil || err2 != nil {
+			return false
+		}
+
+		if v1Int > v2Int {
+			return true
+		} else if v1Int < v2Int {
+			return false
+		}
+	}
+
+	return false
 }

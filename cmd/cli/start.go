@@ -22,7 +22,7 @@ var startCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if startVersion == "" {
-			startVersion = models.PreferencesBuiltInVersion
+			startVersion = models.PreferencesLatestVersion
 		}
 
 		hapifhirFolder := models.AdfDirectory + "/" + startVersion + "/hapifhir/hapifhir.war"

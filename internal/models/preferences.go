@@ -5,7 +5,8 @@ import (
 )
 
 type Preferences struct {
-	Bundles []Bundle
+	Bundles       []Bundle
+	LatestVersion string
 }
 
 var LoadedPreferences Preferences
@@ -13,8 +14,7 @@ var LoadedBundle Bundle
 var AdfDirectory string
 
 const (
-	AdfReleaseVersion             = "0.0.6"
-	PreferencesBuiltInVersion     = "0.0.1"
+	PreferencesLatestVersion      = "0.0.6"
 	HapiFhirDefaultPort           = ":8080"
 	ServiceDatacCollectionAddress = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json"
 	AdfPreferencesFileName        = "preferences.json"
@@ -31,8 +31,9 @@ var staticServiceDataArr = map[string]ServiceData{
 
 var staticPreferences = Preferences{
 	Bundles: []Bundle{
-		{Services: staticServiceDataArr, Version: PreferencesBuiltInVersion},
+		{Services: staticServiceDataArr, Version: PreferencesLatestVersion},
 	},
+	LatestVersion: PreferencesLatestVersion,
 }
 
 func GetStaticServiceDataAsJson() (string, error) {

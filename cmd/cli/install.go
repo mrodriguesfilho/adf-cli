@@ -54,7 +54,7 @@ func init() {
 func execute() {
 
 	if installVersion == "" {
-		installVersion = models.PreferencesBuiltInVersion
+		installVersion = models.PreferencesLatestVersion
 	}
 
 	var bundle = GetBundleVersion(installVersion)
