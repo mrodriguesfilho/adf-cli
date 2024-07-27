@@ -14,7 +14,7 @@ var LoadedBundle Bundle
 var AdfDirectory string
 
 const (
-	PreferencesLatestVersion      = "0.0.6"
+	PreferencesLatestVersion      = "0.7.0"
 	HapiFhirDefaultPort           = ":8080"
 	ServiceDatacCollectionAddress = "https://raw.githubusercontent.com/mrodriguesfilho/adf-cli/main/preferences.json"
 	AdfPreferencesFileName        = "preferences.json"
