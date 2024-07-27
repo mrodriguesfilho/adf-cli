@@ -92,9 +92,9 @@ func initConfig() {
 		createPreferencesFile()
 	}
 
-	validateLatestPreferences(preferences)
-
 	models.LoadedPreferences = preferences
+
+	validateLatestPreferences(preferences)
 }
 
 func createApplicationFolder() {
@@ -213,6 +213,7 @@ func validateLatestPreferences(preferences models.Preferences) {
 
 	if versionGreaterThan(latestPreferences.LatestVersion, preferences.LatestVersion) {
 		createPreferencesFile()
+		models.LoadedPreferences = latestPreferences
 	}
 }
 
