@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -19,12 +21,26 @@ var listCmd = &cobra.Command{
 	Short: "Exibe as versões disponíveis dos serviços relacinados ao ADF",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+
 		bundleArr := getBundles()
+		runningOS := runtime.GOOS
+
 		for _, bundle := range bundleArr {
 			fmt.Println("-------")
 			fmt.Printf("Service Data Version: %s \n", bundle.Version)
 			for key, serviceEntry := range bundle.Services {
-				fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
+				if strings.Contains(key, ":") {
+					keyWithOS := strings.Split(key, ":")
+
+					if keyWithOS[1] != runningOS {
+						continue
+					}
+
+					fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
+
+				} else {
+					fmt.Printf("Service: %s | Version: %s \n", key, serviceEntry.Version)
+				}
 			}
 			fmt.Println("-------")
 		}
