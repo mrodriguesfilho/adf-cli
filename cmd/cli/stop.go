@@ -48,7 +48,7 @@ func init() {
 }
 
 func RunUnix() error {
-	bashCmd := exec.Command("lsof", "-i", models.HapiFhirDefaultPort)
+	bashCmd := exec.Command("lsof", "-t", "-i", models.HapiFhirDefaultPort)
 
 	stdout, err := bashCmd.Output()
 	cobra.CheckErr(err)
@@ -63,16 +63,14 @@ func RunUnix() error {
 		return fmt.Errorf("output incompatível com a CLI")
 	}
 
-	pid := parts[1]
+	for _, pid := range lines {
+		bashCmd = exec.Command("kill", pid)
+		_, err := bashCmd.CombinedOutput()
 
-	bashCmd = exec.Command("kill", pid)
-	output, err := bashCmd.CombinedOutput()
-
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
 	}
-
-	fmt.Println(string(output))
 
 	return nil
 }
