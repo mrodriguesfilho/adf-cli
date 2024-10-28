@@ -9,7 +9,7 @@
                     "Installed": false
                 },
                 "hapifhir-validator": {
-                    "Version": "6.13.16",
+                    "Version": "6.13.18",
                     "DownloadUrl": "https://github.com/hapifhir/org.hl7.fhir.core/releases/latest/download/validator_cli.jar",
                     "FileName": "validator_cli.jar",
                     "Installed": false
@@ -33,8 +33,8 @@
                     "Installed": false
                 }
             },
-            "Version": "0.7.0"
+            "Version": "0.8.0"
         }
     ],
-    "LatestVersion": "0.7.0"
+    "LatestVersion": "0.8.0"
 }
