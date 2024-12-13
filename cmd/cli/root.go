@@ -44,18 +44,12 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	Example: `
 	$ adf install --version 0.0.1
-	Instalando versão 0.0.1 do ADF Web...
-	Versão 0.0.1 do ADF Web instalada com sucesso
 
 	$ adf list
-	Versões instaladas:
-	ADF Web 0.0.1
 
-	$ adf use 0.0.1
-	Definida a versão 0.0.1 do ADF Web a ser utilizada
-
-	$ adf list
-	ADF Web 0.0.1 - em uso`,
+	$ adf start
+	
+	$ adf stop`,
 
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

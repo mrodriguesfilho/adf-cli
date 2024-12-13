@@ -57,7 +57,12 @@ func execute() {
 		installVersion = models.PreferencesLatestVersion
 	}
 
-	var bundle = GetBundleVersion(installVersion)
+	var bundle, err = GetBundleVersion(installVersion)
+
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
 
 	if installDir == "" {
 		installDir = models.AdfDirectory
@@ -79,21 +84,21 @@ func execute() {
 		}
 	}
 
-	err := WriteToReferences(installVersion, installDir)
+	err = WriteToReferences(installVersion, installDir)
 	if err != nil {
 		fmt.Printf("falha ao escrever o novo arquivo de referencias. Erro: %v", err)
 	}
 }
 
-func GetBundleVersion(installVersion string) models.Bundle {
+func GetBundleVersion(installVersion string) (models.Bundle, error) {
 
 	for i := 0; i < len(models.LoadedPreferences.Bundles); i++ {
 		if installVersion == models.LoadedPreferences.Bundles[i].Version {
-			return models.LoadedPreferences.Bundles[i]
+			return models.LoadedPreferences.Bundles[i], nil
 		}
 	}
 
-	return models.Bundle{}
+	return models.Bundle{}, fmt.Errorf("nenhum Bundle com versão %s foi encontrado no preferences.json", installVersion)
 }
 
 func WriteToReferences(installVersion, installedDir string) error {
